@@ -12,6 +12,7 @@ concurrency:
 
 env:
   XCODE_VERSION: '26.0'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-test:
@@ -54,7 +55,7 @@ jobs:
           xcodebuild test \
             -project JourneyTI/JourneyTI.xcodeproj \
             -scheme JourneyTI \
-            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 17 Pro' \
+            -destination 'platform=iOS Simulator,OS=latest' \
             CODE_SIGNING_ALLOWED=NO \
             -enableCodeCoverage YES \
             -resultBundlePath TestResults.xcresult \
