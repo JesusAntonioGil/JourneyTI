@@ -51,18 +51,15 @@ jobs:
 
       - name: Resolve simulator
         run: |
-          UDID=$(xcrun simctl list devices available -j | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-for rt, devs in sorted(data['devices'].items(), reverse=True):
-    for d in devs:
-        if d.get('isAvailable') and 'iPhone' in d['name']:
-            print(d['udid']); sys.exit(0)
-" 2>/dev/null)
+          UDID=$(xcrun simctl list devices available \
+            | grep -E "iPhone" \
+            | grep -oE '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}' \
+            | tail -1)
           if [ -z "$UDID" ]; then
-            UDID=$(xcrun simctl create "CI-iPhone" "iPhone 16" 2>/dev/null || xcrun simctl create "CI-iPhone" "iPhone 15" 2>/dev/null)
+            UDID=$(xcrun simctl create "CI-iPhone" "iPhone 16" 2>/dev/null \
+              || xcrun simctl create "CI-iPhone" "iPhone 15" 2>/dev/null)
           fi
-          echo "SIM_UDID=$UDID" >> $GITHUB_ENV
+          echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
           echo "Simulator UDID: $UDID"
 
       - name: Build & Test
@@ -71,7 +68,7 @@ for rt, devs in sorted(data['devices'].items(), reverse=True):
           xcodebuild test \
             -project JourneyTI/JourneyTI.xcodeproj \
             -scheme JourneyTI \
-            -destination "platform=iOS Simulator,id=${{ env.SIM_UDID }}" \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
             CODE_SIGNING_ALLOWED=NO \
             -enableCodeCoverage YES \
             -resultBundlePath TestResults.xcresult \
