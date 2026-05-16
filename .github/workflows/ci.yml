@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  XCODE_VERSION: '26.0'
+
 jobs:
   build-and-test:
     name: Build & Test
@@ -20,11 +23,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
+        continue-on-error: true
+
       - name: Show Xcode version
         run: xcrun xcodebuild -version
 
-      - name: Install SwiftLint
-        run: brew install swiftlint
+      - name: Cache Homebrew packages
+        uses: actions/cache@v4
+        id: brew-cache
+        with:
+          path: |
+            /opt/homebrew/Cellar/swiftlint
+            /opt/homebrew/Cellar/xcbeautify
+            /opt/homebrew/bin/swiftlint
+            /opt/homebrew/bin/xcbeautify
+          key: ${{ runner.os }}-brew-swiftlint-xcbeautify-v1
+
+      - name: Install SwiftLint and xcbeautify
+        if: steps.brew-cache.outputs.cache-hit != 'true'
+        run: brew install swiftlint xcbeautify
 
       - name: SwiftLint
         run: swiftlint lint --reporter github-actions-logging
@@ -37,7 +56,16 @@ jobs:
             -scheme JourneyTI \
             -destination 'platform=iOS Simulator,OS=latest,name=iPhone 17 Pro' \
             CODE_SIGNING_ALLOWED=NO \
-            -resultBundlePath TestResults.xcresult
+            -enableCodeCoverage YES \
+            -resultBundlePath TestResults.xcresult \
+            2>&1 | xcbeautify --renderer github-actions
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          xcode: true
+          xcode_archive_path: TestResults.xcresult
+          fail_ci_if_error: false
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
