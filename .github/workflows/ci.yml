@@ -12,7 +12,6 @@ concurrency:
 
 env:
   XCODE_VERSION: '26.0'
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-test:
@@ -74,11 +73,16 @@ jobs:
             -resultBundlePath TestResults.xcresult \
             2>&1 | xcbeautify --renderer github-actions
 
+      - name: Export coverage
+        if: always()
+        run: |
+          xcrun xccov view --report --json TestResults.xcresult \
+            > xccov_report.json 2>/dev/null || true
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          xcode: true
-          xcode_archive_path: TestResults.xcresult
+          file: xccov_report.json
           fail_ci_if_error: false
 
       - name: Upload test results
