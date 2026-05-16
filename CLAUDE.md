@@ -129,6 +129,29 @@ Invoca con `/nombre-del-skill`:
 
 ---
 
+## Agentes y paralelismo
+
+Usa agentes y subagentes en paralelo **siempre que las tareas sean independientes entre sí**. Este es el modo de trabajo preferido en este proyecto.
+
+**Cuándo lanzar agentes en paralelo:**
+- Implementar varias capas simultáneamente (Domain + Infrastructure + Presentation)
+- Crear tests mientras se implementa el código de producción
+- Investigar varias partes del código a la vez
+- Ejecutar búsquedas o lecturas de ficheros independientes
+
+**Cómo hacerlo:**
+- Lanza múltiples llamadas `Agent` en el mismo mensaje (un bloque de tool calls)
+- Usa `run_in_background: true` para agentes que no bloquean el flujo
+- Define contratos compartidos (protocolos, entidades) antes de lanzar agentes en paralelo, para que todos trabajen contra la misma interfaz
+- Usa `TaskCreate` / `TaskUpdate` para hacer el progreso visible mientras los agentes trabajan
+
+**Tipos de agente recomendados:**
+- `Explore` — búsquedas y lectura de código (read-only, rápido)
+- `general-purpose` — implementación de código, multi-paso
+- `Plan` — diseño de arquitectura antes de implementar
+
+---
+
 ## MCPs activos
 
 - **atlassian** — Jira y Confluence (leer/escribir issues, páginas)
