@@ -6,10 +6,13 @@ private extension Color {
 }
 
 struct LoginView: View {
-    @State private var email = ""
-    @State private var password = ""
+    @State private var loginViewModel = LoginViewModel(
+        useCase: LoginUseCase(repository: MockAuthRepository())
+    )
 
     var body: some View {
+        @Bindable var vm = loginViewModel
+
         ZStack {
             Color.white
                 .ignoresSafeArea()
@@ -20,15 +23,35 @@ struct LoginView: View {
                         .padding(.top, 80)
                         .padding(.bottom, 48)
 
-                    form
-                        .padding(.bottom, 32)
+                    form(email: $vm.email, password: $vm.password)
+                        .padding(.bottom, 8)
+
+                    if let message = loginViewModel.errorMessage {
+                        Text(message)
+                            .foregroundStyle(.red)
+                            .font(.footnote)
+                            .multilineTextAlignment(.center)
+                            .padding(.bottom, 16)
+                    }
 
                     actions
+                        .padding(.bottom, 32)
                 }
                 .padding(.horizontal, 32)
             }
             .scrollBounceBehavior(.basedOnSize)
+
+            if loginViewModel.isLoading {
+                ZStack {
+                    Color.black.opacity(0.15)
+                        .ignoresSafeArea()
+                    ProgressView()
+                        .scaleEffect(1.5)
+                }
+            }
         }
+        .animation(.easeInOut(duration: 0.2), value: loginViewModel.errorMessage)
+        .animation(.easeInOut(duration: 0.2), value: loginViewModel.isLoading)
     }
 
     private var header: some View {
@@ -45,9 +68,9 @@ struct LoginView: View {
         }
     }
 
-    private var form: some View {
+    private func form(email: Binding<String>, password: Binding<String>) -> some View {
         VStack(spacing: 16) {
-            TextField("Email", text: $email)
+            TextField("Email", text: email)
                 .keyboardType(.emailAddress)
                 .textContentType(.emailAddress)
                 .textInputAutocapitalization(.never)
@@ -57,7 +80,7 @@ struct LoginView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .accessibilityLabel("Dirección de email")
 
-            SecureField("Contraseña", text: $password)
+            SecureField("Contraseña", text: password)
                 .textContentType(.password)
                 .padding()
                 .background(Color(.systemGray6))
@@ -68,13 +91,16 @@ struct LoginView: View {
 
     private var actions: some View {
         VStack(spacing: 16) {
-            Button("Iniciar sesión") {}
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.loginAccent)
-                .foregroundStyle(.white)
-                .font(.system(size: 16, weight: .semibold))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+            Button("Iniciar sesión") {
+                Task { await loginViewModel.login() }
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(loginViewModel.isLoginEnabled ? Color.loginAccent : Color(.systemGray4))
+            .foregroundStyle(.white)
+            .font(.system(size: 16, weight: .semibold))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .disabled(!loginViewModel.isLoginEnabled || loginViewModel.isLoading)
 
             Button("¿No tienes cuenta? Regístrate") {}
                 .foregroundStyle(Color.loginAccent)
