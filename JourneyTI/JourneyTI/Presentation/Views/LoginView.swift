@@ -11,7 +11,7 @@ struct LoginView: View {
     )
 
     var body: some View {
-        @Bindable var vm = loginViewModel
+        @Bindable var viewModel = loginViewModel
 
         ZStack {
             Color.white
@@ -23,7 +23,7 @@ struct LoginView: View {
                         .padding(.top, 80)
                         .padding(.bottom, 48)
 
-                    form(email: $vm.email, password: $vm.password)
+                    form(email: $viewModel.email, password: $viewModel.password)
                         .padding(.bottom, 8)
 
                     if let message = loginViewModel.errorMessage {
