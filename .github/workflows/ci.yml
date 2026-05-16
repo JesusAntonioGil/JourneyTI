@@ -49,6 +49,15 @@ jobs:
       - name: SwiftLint
         run: swiftlint lint --reporter github-actions-logging
 
+      - name: Debug simulator environment
+        run: |
+          echo "=== Runtimes ==="
+          xcrun simctl list runtimes
+          echo "=== Available devices ==="
+          xcrun simctl list devices available | grep -E "iPhone|iPad" | head -30
+          echo "=== Xcode SDKs ==="
+          xcodebuild -showsdks 2>/dev/null | grep -i sim
+
       - name: Build & Test
         run: |
           set -o pipefail
