@@ -14,7 +14,7 @@ struct JourneyTIApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                ContentView()
+                LoginView()
                 if splashViewModel.isActive {
                     SplashView()
                         .transition(.opacity)

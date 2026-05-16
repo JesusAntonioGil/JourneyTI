@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  XCODE_VERSION: '26.0'
+
 jobs:
   build-and-test:
     name: Build & Test
@@ -18,16 +21,45 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
+        continue-on-error: true
 
       - name: Show Xcode version
         run: xcrun xcodebuild -version
 
-      - name: Install SwiftLint
-        run: brew install swiftlint
+      - name: Cache Homebrew packages
+        uses: actions/cache@v5
+        id: brew-cache
+        with:
+          path: |
+            /opt/homebrew/Cellar/swiftlint
+            /opt/homebrew/Cellar/xcbeautify
+            /opt/homebrew/bin/swiftlint
+            /opt/homebrew/bin/xcbeautify
+          key: ${{ runner.os }}-brew-swiftlint-xcbeautify-v1
+
+      - name: Install SwiftLint and xcbeautify
+        if: steps.brew-cache.outputs.cache-hit != 'true'
+        run: brew install swiftlint xcbeautify
 
       - name: SwiftLint
         run: swiftlint lint --reporter github-actions-logging
+
+      - name: Resolve simulator
+        run: |
+          UDID=$(xcrun simctl list devices available \
+            | grep -E "iPhone" \
+            | grep -oE '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}' \
+            | tail -1)
+          if [ -z "$UDID" ]; then
+            UDID=$(xcrun simctl create "CI-iPhone" "iPhone 16" 2>/dev/null \
+              || xcrun simctl create "CI-iPhone" "iPhone 15" 2>/dev/null)
+          fi
+          echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
+          echo "Simulator UDID: $UDID"
 
       - name: Build & Test
         run: |
@@ -35,12 +67,26 @@ jobs:
           xcodebuild test \
             -project JourneyTI/JourneyTI.xcodeproj \
             -scheme JourneyTI \
-            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 17 Pro' \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
             CODE_SIGNING_ALLOWED=NO \
-            -resultBundlePath TestResults.xcresult
+            -enableCodeCoverage YES \
+            -resultBundlePath TestResults.xcresult \
+            2>&1 | xcbeautify --renderer github-actions
+
+      - name: Export coverage
+        if: always()
+        run: |
+          xcrun xccov view --report --json TestResults.xcresult \
+            > xccov_report.json 2>/dev/null || true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          file: xccov_report.json
+          fail_ci_if_error: false
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.run_id }}
