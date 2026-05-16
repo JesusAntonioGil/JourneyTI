@@ -5,7 +5,7 @@ final class SplashViewModel {
     private(set) var isActive = true
     private let duration: Duration
 
-    init(duration: Duration = .seconds(2)) {
+    init(duration: Duration = .seconds(3)) {
         self.duration = duration
     }
 
