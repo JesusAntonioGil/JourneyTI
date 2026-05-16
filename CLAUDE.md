@@ -129,6 +129,20 @@ Invoca con `/nombre-del-skill`:
 
 ---
 
+## Selección de modelo por tarea
+
+Usa el modelo más económico que sea suficiente para la tarea. El parámetro `model` en cada llamada `Agent` controla esto.
+
+| Modelo | Cuándo usarlo |
+|---|---|
+| `haiku` | Búsquedas, lectura de ficheros, grep, lint, tareas de un solo paso sin razonamiento complejo |
+| `sonnet` | Implementación de código, tests, PRs, corrección de bugs, tareas de desarrollo habituales |
+| `opus` | Diseño de arquitectura, planning multi-fichero, revisiones críticas, decisiones con muchas dependencias |
+
+**Regla general:** empieza por `haiku` para exploración y `sonnet` para implementación. Escala a `opus` solo cuando la tarea requiera razonamiento profundo sobre el sistema completo.
+
+---
+
 ## Agentes y paralelismo
 
 Usa agentes y subagentes en paralelo **siempre que las tareas sean independientes entre sí**. Este es el modo de trabajo preferido en este proyecto.
