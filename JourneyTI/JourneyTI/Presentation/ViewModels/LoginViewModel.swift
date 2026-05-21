@@ -19,15 +19,22 @@ final class LoginViewModel {
         return afterAt.contains(".") && !password.isEmpty
     }
 
+    private(set) var isAuthenticated = false
+
     func login() async {
         isLoading = true
         errorMessage = nil
         do {
             _ = try await useCase.execute(email: email, password: password)
+            isAuthenticated = true
             isLoading = false
         } catch {
             errorMessage = error.localizedDescription
             isLoading = false
         }
+    }
+
+    func markAuthenticated() {
+        isAuthenticated = true
     }
 }

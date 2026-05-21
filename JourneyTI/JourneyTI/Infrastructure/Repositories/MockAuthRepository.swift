@@ -18,4 +18,13 @@ struct MockAuthRepository: AuthRepository {
             name: "Demo User"
         )
     }
+
+    func register(email: String, password: String) async throws -> User {
+        try await Task.sleep(for: .milliseconds(800))
+        return User(id: UUID().uuidString, email: email, name: "")
+    }
+
+    func resetPassword(email: String) async throws {
+        try await Task.sleep(for: .milliseconds(800))
+    }
 }

@@ -6,9 +6,13 @@ private extension Color {
 }
 
 struct LoginView: View {
-    @State private var loginViewModel = LoginViewModel(
-        useCase: LoginUseCase(repository: MockAuthRepository())
-    )
+    private let loginViewModel: LoginViewModel
+    @State private var showRegister = false
+    @State private var showForgotPassword = false
+
+    init(viewModel: LoginViewModel) {
+        loginViewModel = viewModel
+    }
 
     var body: some View {
         @Bindable var viewModel = loginViewModel
@@ -52,6 +56,21 @@ struct LoginView: View {
         }
         .animation(.easeInOut(duration: 0.2), value: loginViewModel.errorMessage)
         .animation(.easeInOut(duration: 0.2), value: loginViewModel.isLoading)
+        .sheet(isPresented: $showRegister) {
+            RegisterView(
+                viewModel: RegisterViewModel(
+                    useCase: RegisterUseCase(repository: FirebaseAuthRepository()),
+                    onSuccess: { loginViewModel.markAuthenticated() }
+                )
+            )
+        }
+        .sheet(isPresented: $showForgotPassword) {
+            ForgotPasswordView(
+                viewModel: ForgotPasswordViewModel(
+                    useCase: ResetPasswordUseCase(repository: FirebaseAuthRepository())
+                )
+            )
+        }
     }
 
     private var header: some View {
@@ -102,13 +121,21 @@ struct LoginView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .disabled(!loginViewModel.isLoginEnabled || loginViewModel.isLoading)
 
-            Button("¿No tienes cuenta? Regístrate") {}
-                .foregroundStyle(Color.loginAccent)
-                .font(.system(size: 15, weight: .medium))
+            Button("¿Olvidaste tu contraseña?") {
+                showForgotPassword = true
+            }
+            .foregroundStyle(Color.loginAccent)
+            .font(.system(size: 15, weight: .medium))
+
+            Button("¿No tienes cuenta? Regístrate") {
+                showRegister = true
+            }
+            .foregroundStyle(Color.loginAccent)
+            .font(.system(size: 15, weight: .medium))
         }
     }
 }
 
 #Preview {
-    LoginView()
+    LoginView(viewModel: LoginViewModel(useCase: LoginUseCase(repository: MockAuthRepository())))
 }
