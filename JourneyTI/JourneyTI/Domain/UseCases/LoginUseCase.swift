@@ -13,4 +13,8 @@ final class LoginUseCase {
         }
         return try await repository.login(email: email, password: password)
     }
+
+    func currentUser() -> User? {
+        repository.currentUser()
+    }
 }

@@ -27,4 +27,6 @@ struct MockAuthRepository: AuthRepository {
     func resetPassword(email: String) async throws {
         try await Task.sleep(for: .milliseconds(800))
     }
+
+    func currentUser() -> User? { nil }
 }

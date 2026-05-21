@@ -34,6 +34,11 @@ final class FirebaseAuthRepository: AuthRepository {
             throw AuthError(firebaseError: err)
         }
     }
+
+    func currentUser() -> User? {
+        guard let user = Auth.auth().currentUser else { return nil }
+        return User(id: user.uid, email: user.email ?? "", name: user.displayName ?? "")
+    }
 }
 
 private extension AuthError {

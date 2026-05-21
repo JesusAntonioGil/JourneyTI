@@ -37,4 +37,10 @@ final class LoginViewModel {
     func markAuthenticated() {
         isAuthenticated = true
     }
+
+    func checkSession() {
+        if useCase.currentUser() != nil {
+            isAuthenticated = true
+        }
+    }
 }

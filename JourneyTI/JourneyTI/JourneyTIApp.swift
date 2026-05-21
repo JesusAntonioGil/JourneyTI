@@ -33,7 +33,10 @@ struct JourneyTIApp: App {
                 }
             }
             .animation(.easeOut(duration: 0.5), value: splashViewModel.isActive)
-            .task { splashViewModel.start() }
+            .task {
+                loginViewModel.checkSession()
+                splashViewModel.start()
+            }
         }
     }
 }
