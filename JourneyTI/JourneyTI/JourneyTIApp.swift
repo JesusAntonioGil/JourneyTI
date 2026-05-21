@@ -7,13 +7,11 @@ struct JourneyTIApp: App {
     @State private var loginViewModel: LoginViewModel
 
     init() {
-        if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
-            FirebaseApp.configure()
-        }
+        let hasConfig = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+        if hasConfig { FirebaseApp.configure() }
+        let repository: any AuthRepository = hasConfig ? FirebaseAuthRepository() : MockAuthRepository()
         _loginViewModel = State(
-            initialValue: LoginViewModel(
-                useCase: LoginUseCase(repository: FirebaseAuthRepository())
-            )
+            initialValue: LoginViewModel(useCase: LoginUseCase(repository: repository))
         )
     }
 
