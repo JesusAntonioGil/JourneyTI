@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0BF0FEDD2FBF06600063016D /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0BF0FEDC2FBF06600063016D /* FirebaseAuth */; };
+		0BF0FEE02FBF06600063016D /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0BF0FEE12FBF06600063016D /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0BF0FEDD2FBF06600063016D /* FirebaseAuth in Frameworks */,
+				0BF0FEE02FBF06600063016D /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +120,7 @@
 			name = JourneyTI;
 			packageProductDependencies = (
 				0BF0FEDC2FBF06600063016D /* FirebaseAuth */,
+				0BF0FEE12FBF06600063016D /* FirebaseAnalytics */,
 			);
 			productName = JourneyTI;
 			productReference = 0B68B1912FB7C92200D751F1 /* JourneyTI.app */;
@@ -604,6 +607,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0BF0FEDB2FBF06600063016D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
+		};
+		0BF0FEE12FBF06600063016D /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0BF0FEDB2FBF06600063016D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

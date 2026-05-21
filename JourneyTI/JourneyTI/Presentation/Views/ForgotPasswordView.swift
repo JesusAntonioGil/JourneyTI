@@ -58,6 +58,7 @@ struct ForgotPasswordView: View {
                 }
             }
         }
+        .onAppear { viewModel.onViewAppear() }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
         .animation(.easeInOut(duration: 0.2), value: viewModel.isLoading)
         .animation(.easeInOut(duration: 0.3), value: viewModel.isEmailSent)
@@ -92,6 +93,7 @@ struct ForgotPasswordView: View {
 
     private var sendButton: some View {
         Button("Enviar enlace de recuperación") {
+            viewModel.onSubmitTapped()
             Task { await viewModel.sendReset() }
         }
         .frame(maxWidth: .infinity)
@@ -131,7 +133,8 @@ struct ForgotPasswordView: View {
 #Preview {
     ForgotPasswordView(
         viewModel: ForgotPasswordViewModel(
-            useCase: ResetPasswordUseCase(repository: MockAuthRepository())
+            useCase: ResetPasswordUseCase(repository: MockAuthRepository()),
+            analyticsService: NoOpAnalyticsService()
         )
     )
 }

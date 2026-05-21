@@ -9,13 +9,20 @@ struct LoginView: View {
     private let loginViewModel: LoginViewModel
     private let registerUseCase: RegisterUseCase
     private let resetPasswordUseCase: ResetPasswordUseCase
+    private let analyticsService: any AnalyticsService
     @State private var showRegister = false
     @State private var showForgotPassword = false
 
-    init(viewModel: LoginViewModel, registerUseCase: RegisterUseCase, resetPasswordUseCase: ResetPasswordUseCase) {
+    init(
+        viewModel: LoginViewModel,
+        registerUseCase: RegisterUseCase,
+        resetPasswordUseCase: ResetPasswordUseCase,
+        analyticsService: any AnalyticsService
+    ) {
         loginViewModel = viewModel
         self.registerUseCase = registerUseCase
         self.resetPasswordUseCase = resetPasswordUseCase
+        self.analyticsService = analyticsService
     }
 
     var body: some View {
@@ -58,12 +65,14 @@ struct LoginView: View {
                 }
             }
         }
+        .onAppear { loginViewModel.onViewAppear() }
         .animation(.easeInOut(duration: 0.2), value: loginViewModel.errorMessage)
         .animation(.easeInOut(duration: 0.2), value: loginViewModel.isLoading)
         .sheet(isPresented: $showRegister) {
             RegisterView(
                 viewModel: RegisterViewModel(
                     useCase: registerUseCase,
+                    analyticsService: analyticsService,
                     onSuccess: { loginViewModel.markAuthenticated() }
                 )
             )
@@ -71,7 +80,8 @@ struct LoginView: View {
         .sheet(isPresented: $showForgotPassword) {
             ForgotPasswordView(
                 viewModel: ForgotPasswordViewModel(
-                    useCase: resetPasswordUseCase
+                    useCase: resetPasswordUseCase,
+                    analyticsService: analyticsService
                 )
             )
         }
@@ -115,6 +125,7 @@ struct LoginView: View {
     private var actions: some View {
         VStack(spacing: 16) {
             Button("Iniciar sesión") {
+                loginViewModel.onLoginTapped()
                 Task { await loginViewModel.login() }
             }
             .frame(maxWidth: .infinity)
@@ -126,12 +137,14 @@ struct LoginView: View {
             .disabled(!loginViewModel.isLoginEnabled || loginViewModel.isLoading)
 
             Button("¿Olvidaste tu contraseña?") {
+                loginViewModel.onForgotPasswordTapped()
                 showForgotPassword = true
             }
             .foregroundStyle(Color.loginAccent)
             .font(.system(size: 15, weight: .medium))
 
             Button("¿No tienes cuenta? Regístrate") {
+                loginViewModel.onRegisterTapped()
                 showRegister = true
             }
             .foregroundStyle(Color.loginAccent)
@@ -143,8 +156,9 @@ struct LoginView: View {
 #Preview {
     let repo = MockAuthRepository()
     LoginView(
-        viewModel: LoginViewModel(useCase: LoginUseCase(repository: repo)),
+        viewModel: LoginViewModel(useCase: LoginUseCase(repository: repo), analyticsService: NoOpAnalyticsService()),
         registerUseCase: RegisterUseCase(repository: repo),
-        resetPasswordUseCase: ResetPasswordUseCase(repository: repo)
+        resetPasswordUseCase: ResetPasswordUseCase(repository: repo),
+        analyticsService: NoOpAnalyticsService()
     )
 }

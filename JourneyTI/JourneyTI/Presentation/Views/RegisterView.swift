@@ -53,6 +53,7 @@ struct RegisterView: View {
                 }
             }
         }
+        .onAppear { viewModel.onViewAppear() }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
         .animation(.easeInOut(duration: 0.2), value: viewModel.isLoading)
     }
@@ -105,6 +106,7 @@ struct RegisterView: View {
 
     private var registerButton: some View {
         Button("Registrarse") {
+            viewModel.onSubmitTapped()
             Task { await viewModel.register() }
         }
         .frame(maxWidth: .infinity)
@@ -121,6 +123,7 @@ struct RegisterView: View {
     RegisterView(
         viewModel: RegisterViewModel(
             useCase: RegisterUseCase(repository: MockAuthRepository()),
+            analyticsService: NoOpAnalyticsService(),
             onSuccess: {}
         )
     )
