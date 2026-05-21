@@ -18,4 +18,15 @@ enum AuthError: LocalizedError, Equatable {
         case .unknown: "Ha ocurrido un error inesperado"
         }
     }
+
+    var analyticsCode: String {
+        switch self {
+        case .invalidCredentials: return "invalid_credentials"
+        case .userNotFound: return "user_not_found"
+        case .emailAlreadyInUse: return "email_already_in_use"
+        case .weakPassword: return "weak_password"
+        case .networkUnavailable: return "network_unavailable"
+        case .unknown: return "unknown"
+        }
+    }
 }
