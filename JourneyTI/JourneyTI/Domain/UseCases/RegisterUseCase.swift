@@ -1,6 +1,6 @@
 import Foundation
 
-final class LoginUseCase {
+final class RegisterUseCase {
     private let repository: any AuthRepository
 
     init(repository: some AuthRepository) {
@@ -11,14 +11,6 @@ final class LoginUseCase {
         guard !email.isEmpty, !password.isEmpty else {
             throw AuthError.invalidCredentials
         }
-        return try await repository.login(email: email, password: password)
-    }
-
-    func currentUser() -> User? {
-        repository.currentUser()
-    }
-
-    func logout() throws {
-        try repository.logout()
+        return try await repository.register(email: email, password: password)
     }
 }
