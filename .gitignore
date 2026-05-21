@@ -47,6 +47,9 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# Firebase — credenciales (no subir al repo)
+GoogleService-Info.plist
+
 # Archivos de configuración local
 *.env
 *.env.local

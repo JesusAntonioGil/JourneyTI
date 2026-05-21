@@ -1,20 +1,32 @@
-//
-//  JourneyTIApp.swift
-//  JourneyTI
-//
-//  Created by Jesus Antonio Gil on 15/5/26.
-//
-
 import SwiftUI
+import FirebaseCore
 
 @main
 struct JourneyTIApp: App {
     @State private var splashViewModel = SplashViewModel()
+    @State private var loginViewModel: LoginViewModel
+
+    init() {
+        FirebaseApp.configure()
+        _loginViewModel = State(
+            initialValue: LoginViewModel(
+                useCase: LoginUseCase(repository: FirebaseAuthRepository())
+            )
+        )
+    }
 
     var body: some Scene {
         WindowGroup {
             ZStack {
-                LoginView()
+                Group {
+                    if loginViewModel.isAuthenticated {
+                        ContentView()
+                    } else {
+                        LoginView(viewModel: loginViewModel)
+                    }
+                }
+                .animation(.easeInOut(duration: 0.3), value: loginViewModel.isAuthenticated)
+
                 if splashViewModel.isActive {
                     SplashView()
                         .transition(.opacity)
