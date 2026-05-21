@@ -27,6 +27,7 @@ final class RegisterViewModel {
         errorMessage = nil
         do {
             _ = try await useCase.execute(email: email, password: password)
+            isLoading = false
             onSuccess()
         } catch {
             errorMessage = error.localizedDescription

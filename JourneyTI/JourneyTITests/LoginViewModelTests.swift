@@ -34,7 +34,6 @@ private final class StubAuthRepository: AuthRepository, @unchecked Sendable {
 // MARK: - Suite
 
 @Suite("LoginViewModel")
-@MainActor
 struct LoginViewModelTests {
 
     private func makeViewModel(result: Result<User, AuthError> = .success(.stub)) -> LoginViewModel {

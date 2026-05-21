@@ -7,11 +7,15 @@ private extension Color {
 
 struct LoginView: View {
     private let loginViewModel: LoginViewModel
+    private let registerUseCase: RegisterUseCase
+    private let resetPasswordUseCase: ResetPasswordUseCase
     @State private var showRegister = false
     @State private var showForgotPassword = false
 
-    init(viewModel: LoginViewModel) {
+    init(viewModel: LoginViewModel, registerUseCase: RegisterUseCase, resetPasswordUseCase: ResetPasswordUseCase) {
         loginViewModel = viewModel
+        self.registerUseCase = registerUseCase
+        self.resetPasswordUseCase = resetPasswordUseCase
     }
 
     var body: some View {
@@ -59,7 +63,7 @@ struct LoginView: View {
         .sheet(isPresented: $showRegister) {
             RegisterView(
                 viewModel: RegisterViewModel(
-                    useCase: RegisterUseCase(repository: FirebaseAuthRepository()),
+                    useCase: registerUseCase,
                     onSuccess: { loginViewModel.markAuthenticated() }
                 )
             )
@@ -67,7 +71,7 @@ struct LoginView: View {
         .sheet(isPresented: $showForgotPassword) {
             ForgotPasswordView(
                 viewModel: ForgotPasswordViewModel(
-                    useCase: ResetPasswordUseCase(repository: FirebaseAuthRepository())
+                    useCase: resetPasswordUseCase
                 )
             )
         }
@@ -137,5 +141,10 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView(viewModel: LoginViewModel(useCase: LoginUseCase(repository: MockAuthRepository())))
+    let repo = MockAuthRepository()
+    LoginView(
+        viewModel: LoginViewModel(useCase: LoginUseCase(repository: repo)),
+        registerUseCase: RegisterUseCase(repository: repo),
+        resetPasswordUseCase: ResetPasswordUseCase(repository: repo)
+    )
 }
