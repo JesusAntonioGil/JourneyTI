@@ -18,6 +18,17 @@ private final class StubAuthRepository: AuthRepository, @unchecked Sendable {
         case .failure(let error): throw error
         }
     }
+
+    func register(email: String, password: String) async throws -> User {
+        try await Task.sleep(for: .milliseconds(50))
+        return User(id: "stub", email: email, name: "")
+    }
+
+    func resetPassword(email: String) async throws {}
+
+    func currentUser() -> User? { nil }
+
+    func logout() throws {}
 }
 
 // MARK: - Suite
