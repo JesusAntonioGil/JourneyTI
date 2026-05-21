@@ -43,4 +43,9 @@ final class LoginViewModel {
             isAuthenticated = true
         }
     }
+
+    func logout() {
+        try? useCase.logout()
+        isAuthenticated = false
+    }
 }

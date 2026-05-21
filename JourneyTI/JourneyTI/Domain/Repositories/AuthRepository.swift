@@ -3,4 +3,5 @@ protocol AuthRepository {
     func register(email: String, password: String) async throws -> User
     func resetPassword(email: String) async throws
     func currentUser() -> User?
+    func logout() throws
 }

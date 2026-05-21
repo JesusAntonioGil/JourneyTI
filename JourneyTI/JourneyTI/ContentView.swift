@@ -1,24 +1,26 @@
-//
-//  ContentView.swift
-//  JourneyTI
-//
-//  Created by Jesus Antonio Gil on 15/5/26.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    let onLogout: () -> Void
+
     var body: some View {
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+
+            Button("Cerrar sesión") {
+                onLogout()
+            }
+            .foregroundStyle(.red)
+            .font(.system(size: 15, weight: .medium))
+            .padding(.top, 32)
         }
         .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(onLogout: {})
 }

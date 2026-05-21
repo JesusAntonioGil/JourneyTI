@@ -17,4 +17,8 @@ final class LoginUseCase {
     func currentUser() -> User? {
         repository.currentUser()
     }
+
+    func logout() throws {
+        try repository.logout()
+    }
 }

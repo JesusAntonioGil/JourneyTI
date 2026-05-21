@@ -20,7 +20,7 @@ struct JourneyTIApp: App {
             ZStack {
                 Group {
                     if loginViewModel.isAuthenticated {
-                        ContentView()
+                        ContentView(onLogout: { loginViewModel.logout() })
                     } else {
                         LoginView(viewModel: loginViewModel)
                     }

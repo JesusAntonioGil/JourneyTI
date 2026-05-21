@@ -39,6 +39,10 @@ final class FirebaseAuthRepository: AuthRepository {
         guard let user = Auth.auth().currentUser else { return nil }
         return User(id: user.uid, email: user.email ?? "", name: user.displayName ?? "")
     }
+
+    func logout() throws {
+        try Auth.auth().signOut()
+    }
 }
 
 private extension AuthError {

@@ -29,4 +29,6 @@ struct MockAuthRepository: AuthRepository {
     }
 
     func currentUser() -> User? { nil }
+
+    func logout() throws {}
 }
