@@ -5,6 +5,8 @@ import FirebaseCore
 struct JourneyTIApp: App {
     @State private var splashViewModel = SplashViewModel()
     @State private var loginViewModel: LoginViewModel
+    private let registerUseCase: RegisterUseCase
+    private let resetPasswordUseCase: ResetPasswordUseCase
 
     init() {
         let hasConfig = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
@@ -13,6 +15,8 @@ struct JourneyTIApp: App {
         _loginViewModel = State(
             initialValue: LoginViewModel(useCase: LoginUseCase(repository: repository))
         )
+        registerUseCase = RegisterUseCase(repository: repository)
+        resetPasswordUseCase = ResetPasswordUseCase(repository: repository)
     }
 
     var body: some Scene {
@@ -22,7 +26,11 @@ struct JourneyTIApp: App {
                     if loginViewModel.isAuthenticated {
                         ContentView(onLogout: { loginViewModel.logout() })
                     } else {
-                        LoginView(viewModel: loginViewModel)
+                        LoginView(
+                            viewModel: loginViewModel,
+                            registerUseCase: registerUseCase,
+                            resetPasswordUseCase: resetPasswordUseCase
+                        )
                     }
                 }
                 .animation(.easeInOut(duration: 0.3), value: loginViewModel.isAuthenticated)

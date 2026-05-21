@@ -8,9 +8,6 @@ final class RegisterUseCase {
     }
 
     func execute(email: String, password: String) async throws -> User {
-        guard !email.isEmpty, !password.isEmpty else {
-            throw AuthError.invalidCredentials
-        }
         return try await repository.register(email: email, password: password)
     }
 }

@@ -8,7 +8,6 @@ final class ResetPasswordUseCase {
     }
 
     func execute(email: String) async throws {
-        guard !email.isEmpty else { throw AuthError.invalidCredentials }
         try await repository.resetPassword(email: email)
     }
 }

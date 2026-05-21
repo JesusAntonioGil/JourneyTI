@@ -2,7 +2,6 @@ import Testing
 @testable import JourneyTI
 
 @Suite("SplashViewModel")
-@MainActor
 struct SplashViewModelTests {
 
     @Test("starts as active")
