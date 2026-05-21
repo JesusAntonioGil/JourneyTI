@@ -7,13 +7,19 @@ struct JourneyTIApp: App {
     @State private var loginViewModel: LoginViewModel
     private let registerUseCase: RegisterUseCase
     private let resetPasswordUseCase: ResetPasswordUseCase
+    private let analyticsService: any AnalyticsService
 
     init() {
         let hasConfig = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
         if hasConfig { FirebaseApp.configure() }
         let repository: any AuthRepository = hasConfig ? FirebaseAuthRepository() : MockAuthRepository()
+        let analyticsService: any AnalyticsService = hasConfig ? FirebaseAnalyticsService() : NoOpAnalyticsService()
+        self.analyticsService = analyticsService
         _loginViewModel = State(
-            initialValue: LoginViewModel(useCase: LoginUseCase(repository: repository))
+            initialValue: LoginViewModel(
+                useCase: LoginUseCase(repository: repository),
+                analyticsService: analyticsService
+            )
         )
         registerUseCase = RegisterUseCase(repository: repository)
         resetPasswordUseCase = ResetPasswordUseCase(repository: repository)
@@ -24,12 +30,13 @@ struct JourneyTIApp: App {
             ZStack {
                 Group {
                     if loginViewModel.isAuthenticated {
-                        ContentView(onLogout: { loginViewModel.logout() })
+                        ContentView(onLogout: { loginViewModel.logout() }, analyticsService: analyticsService)
                     } else {
                         LoginView(
                             viewModel: loginViewModel,
                             registerUseCase: registerUseCase,
-                            resetPasswordUseCase: resetPasswordUseCase
+                            resetPasswordUseCase: resetPasswordUseCase,
+                            analyticsService: analyticsService
                         )
                     }
                 }

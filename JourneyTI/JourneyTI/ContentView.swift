@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     let onLogout: () -> Void
+    let analyticsService: any AnalyticsService
 
     var body: some View {
         VStack {
@@ -11,6 +12,7 @@ struct ContentView: View {
             Text("Hello, world!")
 
             Button("Cerrar sesión") {
+                analyticsService.track(.action(.content, .logout))
                 onLogout()
             }
             .foregroundStyle(.red)
@@ -18,9 +20,10 @@ struct ContentView: View {
             .padding(.top, 32)
         }
         .padding()
+        .onAppear { analyticsService.track(.view(.content)) }
     }
 }
 
 #Preview {
-    ContentView(onLogout: {})
+    ContentView(onLogout: {}, analyticsService: NoOpAnalyticsService())
 }
